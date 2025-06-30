@@ -1,0 +1,28 @@
+import os
+import sys
+
+from inteface import createSlcStack
+from inteface import createCoregistion
+
+
+def coregister(parms_path):
+    """
+    Coregistrating a stack of SAR SLC images from source directory
+    """
+
+    if not os.path.exists(parms_path):
+        raise FileNotFoundError(f"File not found: {parms_path}")
+
+    print(f"Coregistration started with parameters from {parms_path}")
+
+    slc_stack = createSlcStack(parms_path)
+    coregister = createCoregistion(parms_path, slc_stack)
+    coregister.run()
+
+    print("Coregistration completed successfully.")
+
+if __name__ == "__main__":   
+    # load parameters file:
+    parmFile = sys.argv[1]
+
+    coregister(parmFile)
