@@ -1,6 +1,6 @@
-#!/home/yuxiao/.virtualenvs/doris/bin/python3
+#!/usr/bin/env python3
 
-# import os
+import os
 # activate_venv_path = os.path.join('/home/yuxiao/.virtualenvs/doris/', 'bin/activate_this.py')
 # with open(activate_venv_path) as f:
 #     exec(f.read(), {'__file__': activate_venv_path})
@@ -11,11 +11,13 @@ import warnings
 import rasterio
 import numpy as np
 from datetime import datetime
-# from SarSpectrum import SarSpectrum
+from logger_util import Logger
+
+logger = Logger().get_logger()
 
 """
-BC3_DUMP_DATA() reads the BC3 format SLC data, and write to disk the
-DORIS-compatale binary format for DORIS processing.
+LT1_DUMP_DATA() reads the LuTan-1 format SLC data, and writes to disk the
+DORIS-compatible binary format for DORIS processing.
 """
 
 # suppress NotGeoreferencedWarning
@@ -23,7 +25,7 @@ warnings.filterwarnings(
     "ignore", category=rasterio.errors.NotGeoreferencedWarning)  # type: ignore
 
 
-def bc3_to_data(
+def lt1_to_data(
     filein: str,
     fileout: str,
     l0: int = None,
@@ -31,6 +33,28 @@ def bc3_to_data(
     p0: int = None,
     pN: int = None,
 ) -> tuple:
+    """Convert LT1 data to DORIS format
+
+    Parameters
+    ----------
+    filein : str
+        Input LT1 SLC file path
+    fileout : str
+        Output DORIS format file path
+    l0 : int, optional
+        First line to read (1-based), by default None
+    lN : int, optional
+        Last line to read, by default None
+    p0 : int, optional
+        First pixel to read (1-based), by default None
+    pN : int, optional
+        Last pixel to read, by default None
+
+    Returns
+    -------
+    tuple
+        (number of lines, number of pixels)
+    """
 
     if not os.path.exists(filein):
         raise FileNotFoundError("File {} not found!".format(filein))
@@ -46,30 +70,53 @@ def bc3_to_data(
         p0 = 1
     if pN is None:
         pN = src.width
+    
+    print(f"Reading lines {l0} to {lN} and pixels {p0} to {pN} from {filein}")
 
     with open(fileout, "wb") as fout:
         for ln in range(l0 - 1, lN):
             cdata = np.empty((pN - p0 + 1) * 2, dtype="<i2")
-            cdata[0::2] = w[0, ln, p0 - 1: pN].real
-            cdata[1::2] = w[0, ln, p0 - 1: pN].imag
+            cdata[0::2] = w[0, ln, p0 - 1: pN]
+            cdata[1::2] = w[1, ln, p0 - 1: pN]
             cdata.tofile(fout)
 
     return lN - l0 + 1, pN - p0 + 1
 
 
-def bc3_to_res(resFile: str, l0: int, lN: int, p0: int, pN: int) -> bool:
+def lt1_to_res(resFile: str, l0: int, lN: int, p0: int, pN: int) -> bool:
+    """Write crop information to result file
 
-    fileout = "dummy.slc"
+    Parameters
+    ----------
+    resFile : str
+        Result file path
+    l0 : int
+        First line
+    lN : int
+        Last line
+    p0 : int
+        First pixel
+    pN : int
+        Last pixel
+
+    Returns
+    -------
+    bool
+        True if successful
+    """
+
+    fileout = "image.raw"
 
     if resFile is None:
         raise FileNotFoundError()
 
     # check whether the file exist
+    
     outStream = open(resFile, "a")
 
     outStream.write("\n")
     outStream.write("**************************************************\n")
-    outStream.write("*_Start_crop:			FC1\n")
+    outStream.write("*_Start_crop:			LT1\n")
     outStream.write("**************************************************\n")
     outStream.write("Data_output_file: 	%s\n" % fileout)
     outStream.write("Data_output_format: 			complex_short\n")
@@ -78,13 +125,15 @@ def bc3_to_res(resFile: str, l0: int, lN: int, p0: int, pN: int) -> bool:
     outStream.write("Last_line (w.r.t. original_image): 	%s\n" % lN)
     outStream.write("First_pixel (w.r.t. original_image): 	%s\n" % p0)
     outStream.write("Last_pixel (w.r.t. original_image): 	%s\n" % pN)
+    outStream.write("Number of lines (non-multilooked): 	%s\n" % lN)
+    outStream.write("Number of pixels (non-multilooked): 	%s\n" % pN)
 
     outStream.write("**************************************************\n")
     outStream.write("* End_crop:_NORMAL\n")
     outStream.write("**************************************************\n")
 
     outStream.write("\n")
-    outStream.write("    Current time: {}\n".format(datetime.now))
+    outStream.write("    Current time: {}\n".format(datetime.now()))
     outStream.write("\n")
 
     outStream.close()
@@ -102,10 +151,9 @@ def bc3_to_res(resFile: str, l0: int, lN: int, p0: int, pN: int) -> bool:
     return True
 
 
-def bc3_dump_data_usage():
-    print(
-        "\nUsage: python3 bc3_dump_data_usage.py inputfile outputfile l0 lN p0 pN"
-    )  # nopep8
+def lt1_dump_data_usage():
+    """Print usage information"""
+    print("\nUsage: python3 lt1_dump_data.py inputfile outputfile l0 lN p0 pN")
     print("  where inputfile        is the input filename")
     print("        outputfile       is the output filename")
     print("        l0               is the first azimuth line (starting at 1)")
@@ -114,32 +162,14 @@ def bc3_dump_data_usage():
     print("        pN               is the last range pixel")
 
 
-if __name__ == "__main__":
-    try:
-        filein = sys.argv[1]
-        fileout = sys.argv[2]
-    except Exception:
-        print("\nError   : Unrecognized input or missing arguments!\n\n")
-        bc3_dump_data_usage()
-        sys.exit(1)
+def lt1_dump_data(source_data_path, work_dir):
 
-    if len(sys.argv) == 3:
-        l0, lN, p0, pN = None, None, None, None  # type:ignore
-    elif len(sys.argv) == 7:
-        l0 = int(sys.argv[3])
-        lN = int(sys.argv[4])
-        p0 = int(sys.argv[5])
-        pN = int(sys.argv[6])
-    else:
-        print("\nError   : Unrecognized input or wrong arguments!\n\n")
-        bc3_dump_data_usage()
-        sys.exit(1)
+    target_data_path = os.path.join(work_dir, "image.raw")
+    l0, lN, p0, pN = None, None, None, None  
 
-    # locate & read ALOS2 file
-    print("\nStart Cropping BC3 data.\n\n")
-    az_lines, ra_samples = bc3_to_data(filein, fileout, l0, lN, p0, pN)
+    # read LT1 file
+    az_lines, ra_samples = lt1_to_data(source_data_path, target_data_path, l0, lN, p0, pN)
 
-    # ------------------ Plot is Optional -----------------------------------
     # plot & export quicklook
     sys.stdout.write("Exporting quicklook...")
     if l0 is None and lN is None and p0 is None and pN is None:
@@ -148,10 +178,8 @@ if __name__ == "__main__":
         p0: int = 1
         pN: int = ra_samples
 
-    bc3_to_res('test.res', l0, lN, p0, pN)  # write result file
+    
+    res_file = os.path.join(work_dir, "slave.res")
+    lt1_to_res(res_file, l0, lN, p0, pN)
 
-    # quicklook
-    sar_array = SarSpectrum(fileout, pN - p0 + 1, lN - l0 + 1)
-    sar_array.read_sar((1, pN - p0 + 1), (1, lN - l0 + 1))
-    sar_array.quicklook(fileout + '.png', decimate=10)
     sys.stdout.write(" Done.\n")

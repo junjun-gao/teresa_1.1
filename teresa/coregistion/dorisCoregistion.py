@@ -1,19 +1,18 @@
 import os
 import shutil
-from coregistion.coregistion import coregistration
-from teresa.processor.DorisExpert import DorisExpert
+from logger_util import Logger
 
-# 还没有实现的地方
-# 这两个，也是要单独放在一个文件中，然后 import 进来
-# self.dump_data_funcs[radar_type](data_path, date_path)     
-# self.dump_header2doris_funcs[radar_type](meta_path, date_path)
-# anotation
+from teresa.processor.dorisProcessor import dorisProcessor
+from teresa.dump.dump_funcs_map import dump_header2doris_funcs, dump_data_funcs 
 
-class dorisCoregistion(coregistration):
-    def __init__(self, slc_stack, params):
+class dorisCoregistion():
+    def __init__(self, params, slc_stack):
+
+        self.logger = Logger().get_logger()
+
         self.slc_stack = slc_stack
         self.params    = params
-        self.doris     = DorisExpert()
+        self.doris     = dorisProcessor(params)
     
     def run(self):
         """
@@ -27,8 +26,7 @@ class dorisCoregistion(coregistration):
 
         # 3. 用 python 脚本实现 国产卫星数据的 的 读入 和 crop 操作 。
         for date in self.slc_stack.dates:
-            date_path = self.slc_stack.work_dir + os.sep + "workspace" + os.sep + date
-            self.read_files(date, date_path)
+            self.read_files(date)
 
         # 4. 确定 master ，并且把对应的复制到 master 文件夹中，
         self.get_master()
@@ -37,15 +35,18 @@ class dorisCoregistion(coregistration):
         for date in self.slc_stack.dates:
             if date == self.slc_stack.master_date:
                 continue
-            # 这里的 date_path 是指每个日期对应的文件夹
+            # 这里的 date_dir 是指每个日期对应的文件夹
             # TODO 尝试用 多进程/多线程 实现，考虑一下日志要怎么处理
-            date_path = self.slc_stack.work_dir + os.sep + date
-            self.doris.coarseorb(date_path)
-            self.doris.coarsecorr(date_path)
-            self.doris.fine(date_path)
-            self.doris.coregpm(date_path)
-            self.doris.resample(date_path)
-            self.doris.dem(date_path)
+            date_dir = self.slc_stack.work_dir + os.sep + "workspace" + os.sep + date
+            self.doris.coarseorb(date_dir)
+            self.doris.coarsecorr(date_dir)
+            self.doris.fine(date_dir)
+            self.doris.coregpm(date_dir)
+            self.doris.resample(date_dir)
+
+        # 6. 生成 dem 文件
+        dem_path = self.slc_stack.work_dir + os.sep + "workspace" + os.sep + "dem"
+        self.doris.dem(dem_path)
 
     def create_work_dir(self):
         """
@@ -71,32 +72,23 @@ class dorisCoregistion(coregistration):
             date_path = work_dir + os.sep + date
             if not os.path.exists(date_path):
                 os.makedirs(date_path)
-
-            # 创建 meta 和 数据文件 的软连接
-            src_meta = self.slc_stack.meta_path_map[date]
-            dst_meta = date_path + os.sep + os.path.basename(src_meta)
-            if not os.path.exists(dst_meta):
-                os.symlink(src_meta, dst_meta)
-
-            src_data = self.slc_stack.data_path_map[date]
-            dst_data = date_path + os.sep + os.path.basename(src_data)
-            if not os.path.exists(dst_data):
-                os.symlink(src_data, dst_data)
         
         # 生成 dorisin 目录
         dorisin_path = work_dir + os.sep + "dorisin"
-        os.makedirs(dorisin_path)
-        cp_cmd = f"cp ../processor/dorisin/*.dorisin {dorisin_path}"
-        os.system(cp_cmd)
+        if not os.path.exists(dorisin_path):
+            os.makedirs(dorisin_path)
+            cp_cmd = f"cp ./teresa/processor/dorisin/*.dorisin {dorisin_path}"
+            os.system(cp_cmd)
 
     def write_params_to_dorisin(self):
         """
         Write the parameters to the dorisin file.
         """
         for dorisin, params in self.params.items():
-            if dorisin == "Stack_parameters":
+            if dorisin == "stack_parameters":
                 continue
             dorisin_path = self.slc_stack.work_dir + os.sep + "workspace" + os.sep + "dorisin" + os.sep + dorisin + ".dorisin"
+            self.logger.debug(f"Writing parameters to dorisin file: {dorisin_path}")
             for param, value in params.items():
                 with open(dorisin_path, 'r', encoding='utf-8') as f:
                     lines = f.readlines()
@@ -105,7 +97,7 @@ class dorisCoregistion(coregistration):
                 modified = False
                 for line in lines:
                     if line.startswith(param):
-                        updated_lines.append(f"{param}{value}\n")
+                        updated_lines.append(f"{param}    {value}\n")
                         modified = True
                     else:
                         updated_lines.append(line)
@@ -114,21 +106,30 @@ class dorisCoregistion(coregistration):
                     with open(dorisin_path, 'w', encoding='utf-8') as f:
                         f.writelines(updated_lines)
 
-    def read_files(self, date, date_path):
+    def read_files(self, date):
         """
         Read files from the specified date path.
         
         Parameters:
             date_path (str): The path to the date directory.
         """
-        radar_type = self.slc_stack.radar_type
 
         # 两个参数，一个是 data 数据的路径，一个是 date 日期对应的工作路径，只差一个字母，不要混淆
-        data_path = self.slc_stack.data_path_map[date]
-        self.dump_data_funcs[radar_type](data_path, date_path)       # ! 函数里又要判断是否已经存在的逻辑，如果已经存在就不要重新执行了
+        date_dir = self.slc_stack.work_dir + os.sep + "workspace" + os.sep + date
+
+        image_path = os.path.join(date_dir, "image.raw")
+        resFile_path = os.path.join(date_dir, "slave.res")  
+        if os.path.exists(image_path) and os.path.exists(resFile_path):
+            print('read_files already done, skipping...')
+            return
+
+        radar_type = self.slc_stack.radar_type
 
         meta_path = self.slc_stack.meta_path_map[date]
-        self.dump_header2doris_funcs[radar_type](meta_path, date_path)
+        dump_header2doris_funcs[radar_type](meta_path, date_dir)
+
+        data_path = self.slc_stack.data_path_map[date]
+        dump_data_funcs[radar_type](data_path, date_dir)       
         
     def get_master(self):
         """

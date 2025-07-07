@@ -1,51 +1,45 @@
 { 
-    "Stack_parameters" : {
-        "workDir" : '/data/tests/junjun/',                 # processing directory
-        "dataDirs" : ('/data/tests/junjun/ASC142',),       # list of paths to SLC data
-        "swaths" : ('IW1',),                               # list of all usable swaths
-        "min_lon" : '116.40',                              # Specify  AOI corners:
-        "max_lon" : '116.57',
-        "min_lat" : '39.90',
-        "max_lat" : '40.02',
-        "startDate" : '20220106',
-        "endDate" : '20230101',                        # leave blank to use all SLC
-        "masterDate" : '20220717'                      # leave blank to select optimal
+    "stack_parameters" : {
+        "work_dir"    : "/data/tests/junjun",                 # processing directory
+        "data_dirs"   : "/data/stacks/lt1_paris_interferogram/slc",       # list of paths to SLC data
+        "masterDate" : "20240722"                      # leave blank to select optimal
     },
     "coarsecorr" : {
-        "CC_METHOD"   : "/home/rc/sw/g-mapit/",        
+        "CC_METHOD"   : "magfft",        
         "CC_ACC"      : 8000,                              
-        "CC_NWIN"     : 32   
-        "CC_WINSIZE"  : 8000,                              
-        "CC_INITOFF " : 32          
+        "CC_NWIN"     : 21,   
+        "CC_WINSIZE"  : "1024 256",                              
+        "CC_INITOFF " : "orbit"          
     },
     "fine" : {
-        "FC_METHOD"   : "/home/rc/sw/g-mapit/",         
-        "FC_NWIN"     : 8000,                                 
-        "FC_WINSIZE"  : 32,        
-        "FC_ACC"      :8 8,        
-        "FC_INITOFF"  : coarsecorr,                                  
-        "FC_OSFACTOR" : 32    
+        "FC_METHOD"   : "oversample",         
+        "FC_NWIN"     : 2000,                                 
+        "FC_WINSIZE"  : "64 64",        
+        "FC_ACC"      : "8 8",        
+        "FC_INITOFF"  : "coarsecorr",                                  
+        "FC_OSFACTOR" : 32,
+        "FC_SHIFTAZI" : "ON"    
     },
     "coregpm" : {
-        "PM_THRESHOLD" : 0.30,      
-        "PM_DEGREE"    : 2,                                
-        "PM_WEIGHT"    : quadratic,     
-        "PM_MAXITER"   : 8000        
+        "CPM_THRESHOLD" : 0.30,      
+        "CPM_DEGREE"    : 2,                                
+        "CPM_WEIGHT"    : "quadratic",     
+        "CPM_MAXITER"   : 8000        
     },
     "resample" : {
         "RS_METHOD"     : "ts16p",          
-        "RS_SHIFTAZI"   : ON,                                  
+        "RS_SHIFTAZI"   : "ON",                                  
         "RS_OUT_FILE"   : "slave_rsmp.raw",
-        "RS_OUT_FORMAT" : ci2          
+        "RS_OUT_FORMAT" : "ci2"          
     },
     "dem" : {
-        "CRD_IN_DEM"     : "./srtm1_wgs84_ellipsoid.dem",       
+        "CRD_IN_DEM"     : "/data/auxiliary/dem/fr_paris_lt1/srtm1_wgs84_ellipsoid.dem",       
         "CRD_IN_FORMAT"  : "r4",                                  
-        "CRD_IN_SIZE"    : 7201 7201,        
-        "CRD_IN_DELTA"   : 0.000277777777778 0.000277777777778,    
-        "CRD_IN_UL"      : 50.0 1.0,                                  
+        "CRD_IN_SIZE"    : "7201 7201",        
+        "CRD_IN_DELTA"   : "0.000277777777778 0.000277777777778",    
+        "CRD_IN_UL"      : "50.0 1.0",                                  
         "CRD_IN_NODATA"  : -32768,        
         "CRD_OUT_FILE"   : "/dev/null",       
-        "CRD_OUT_DEM_LP" : dem_radar_ell.raw                                  
+        "CRD_OUT_DEM_LP" : "dem_radar_ell.raw"                                  
     }
 }

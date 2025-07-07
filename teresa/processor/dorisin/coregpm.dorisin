@@ -26,11 +26,11 @@ I_RESFILE       coreg.out                       // parameter file
  c
  comment ___COMPUTE COREGISTRATION PARAMETERS___
  c
-PM_THRESHOLD   0.65
-PM_DEGREE      3
-PM_WEIGHT      quadratic                          // none
-PM_MAXITER     8000
-CPM_PLOT       NOBG
+CPM_THRESHOLD   0.65
+CPM_DEGREE      1
+CPM_WEIGHT      quadratic                          // none
+CPM_MAXITER     8000
+ c CPM_PLOT       NOBG
  c CPM_WEIGHT      bamler                          // none
  c CPM_WEIGHT      linear                          // none
  c

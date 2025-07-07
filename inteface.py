@@ -1,10 +1,14 @@
 import os
 
-from slcStack.dorisSlcStack import dorisSlcStack
-from slcStack.snapSlcStack import snapSlcStack  
+from teresa.slcStack.dorisSlcStack import dorisSlcStack
+from teresa.slcStack.snapSlcStack import snapSlcStack  
 
-from coregistion.dorisCoregistion import dorisCoregistion
-from coregistion.snapCoregistion import snapCoregistion
+from teresa.coregistion.dorisCoregistion import dorisCoregistion
+from teresa.coregistion.snapCoregistion import snapCoregistion
+
+from logger_util import Logger
+
+logger = Logger().get_logger()
 
 def createSlcStack(parms_path):
     """
@@ -19,9 +23,13 @@ def createSlcStack(parms_path):
     
     with open(parms_path,'r') as inp:
         parms = eval(inp.read())
+
+    logger.debug("parms:", parms)
     
     parms_file_name = os.path.basename(parms_path)
-    print(parms_file_name)
+
+    logger.debug(parms_file_name)
+
     if parms_file_name == 'snap.parms':
         return snapSlcStack(parms)
     elif parms_file_name == 'doris.parms':
@@ -41,11 +49,7 @@ def createCoregistion(parms_path, slc_stack):
     Returns:
         None
     """
-    for outer_key, inner_dict in data.items():
-        print(f"外层键: {outer_key}")
-        for inner_key, value in inner_dict.items():
-            print(f"  内层键: {inner_key}, 值: {value}")
-
+    
     with open(parms_path,'r') as inp:
         parms = eval(inp.read())
     

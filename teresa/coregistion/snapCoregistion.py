@@ -1,7 +1,6 @@
 import logging
-from coregistion.coregistion import coregistration
 
-class snapCoregistion(coregistration):
+class snapCoregistion(object):
     def __init__(self, parms, slc_stack):
         """
         Initialize the snapCoregistion class.
@@ -32,6 +31,7 @@ class snapCoregistion(coregistration):
         #     self._finalize()
 
         # 1. 创建工作路径
+        pass
 
 
 

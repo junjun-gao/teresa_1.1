@@ -2,7 +2,7 @@ import os
 import subprocess
 
 # DorisExpert
-class DorisExpert():
+class dorisProcessor():
     def __init__(self, params):
         self.params = params   
 
@@ -55,6 +55,7 @@ class DorisExpert():
         self._doris('../dorisin/coregpm.dorisin')
 
     def resample(self, path):
+        
         os.chdir(path)
         if os.path.exists('slave.res'):
             with open('slave.res') as coreg_out:
