@@ -1,33 +1,33 @@
 { 
     "stack_parameters" : {
-        "work_dir"    : "/data/tests/junjun",                 # processing directory
-        "data_dirs"   : "/data/stacks/lt1_paris_interferogram/slc",       # list of paths to SLC data
-        "masterDate" : "20240722"                      # leave blank to select optimal
+        "work_dir"    : "/data/tests/junjun/bc3",                         # processing directory
+        "data_dirs"   : "/data/tests/junjun/coregTest/bc3/slc",           # list of paths to SLC data
+        "masterDate" : "20240404"                                         # leave blank to select optimal
     },
     "coarsecorr" : {
         "CC_METHOD"   : "magfft",        
         "CC_ACC"      : 8000,                              
         "CC_NWIN"     : 21,   
-        "CC_WINSIZE"  : "1024 256",                              
+        "CC_WINSIZE"  : "512 512",                              
         "CC_INITOFF " : "orbit"          
     },
     "fine" : {
         "FC_METHOD"   : "oversample",         
-        "FC_NWIN"     : 2000,                                 
-        "FC_WINSIZE"  : "64 64",        
-        "FC_ACC"      : "8 8",        
+        "FC_NWIN"     : 6000,                                 
+        "FC_WINSIZE"  : "128 128",        
+        "FC_ACC"      : "32 32",        
         "FC_INITOFF"  : "coarsecorr",                                  
         "FC_OSFACTOR" : 32,
         "FC_SHIFTAZI" : "ON"    
     },
     "coregpm" : {
-        "CPM_THRESHOLD" : 0.30,      
-        "CPM_DEGREE"    : 2,                                
+        "CPM_THRESHOLD" : 0.65,      
+        "CPM_DEGREE"    : 3,                                
         "CPM_WEIGHT"    : "quadratic",     
         "CPM_MAXITER"   : 8000        
     },
     "resample" : {
-        "RS_METHOD"     : "ts16p",          
+        "RS_METHOD"     : "rc12p",          
         "RS_SHIFTAZI"   : "ON",                                  
         "RS_OUT_FILE"   : "slave_rsmp.raw",
         "RS_OUT_FORMAT" : "ci2"          

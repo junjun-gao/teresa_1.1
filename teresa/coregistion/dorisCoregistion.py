@@ -69,9 +69,21 @@ class dorisCoregistion():
 
         # 生成所有 date 的目录
         for date in self.slc_stack.dates:
+            # 每个日期对应的工作目录
             date_path = work_dir + os.sep + date
             if not os.path.exists(date_path):
                 os.makedirs(date_path)
+
+            # 创建 meta 和 数据文件 的软连接
+            src_meta = self.slc_stack.meta_path_map[date]
+            dst_meta = date_path + os.sep + os.path.basename(src_meta)
+            if not os.path.exists(dst_meta):
+                os.symlink(src_meta, dst_meta)
+
+            src_data = self.slc_stack.data_path_map[date]
+            dst_data = date_path + os.sep + os.path.basename(src_data)
+            if not os.path.exists(dst_data):
+                os.symlink(src_data, dst_data)
         
         # 生成 dorisin 目录
         dorisin_path = work_dir + os.sep + "dorisin"
@@ -126,10 +138,12 @@ class dorisCoregistion():
         radar_type = self.slc_stack.radar_type
 
         meta_path = self.slc_stack.meta_path_map[date]
-        dump_header2doris_funcs[radar_type](meta_path, date_dir)
+        meta_symlink = os.path.join(date_dir, os.path.basename(meta_path))
+        dump_header2doris_funcs[radar_type](meta_symlink, date_dir)
 
         data_path = self.slc_stack.data_path_map[date]
-        dump_data_funcs[radar_type](data_path, date_dir)       
+        data_symlink = os.path.join(date_dir, os.path.basename(data_path))
+        dump_data_funcs[radar_type](data_symlink, date_dir)       
         
     def get_master(self):
         """

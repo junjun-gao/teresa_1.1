@@ -10,7 +10,6 @@ import os
 # print(f"INFO    : Looking for orbit files between {start_date_str} and {end_date_str} (Beijing Time)...")
 
 import os
-import sys
 from contextlib import redirect_stdout
 import fnmatch
 from typing import Any, Dict

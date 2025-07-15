@@ -21,11 +21,6 @@ class dorisSlcStack():
 
         self.initialize()
 
-        # for key, value in self.meta_path_map.items():
-        #     self.logger.debug(f"Meta file for date {key}: {value}")
-        
-        # for key, value in self.data_path_map.items():
-        #     self.logger.debug(f"data file for date {key}: {value}")
 
     def initialize(self):
         """
