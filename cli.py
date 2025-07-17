@@ -1,7 +1,7 @@
 import os
 import click
-from inteface import createSlcStack
-from inteface import createCoregistion
+from teresa.inteface import createSlcStack
+from teresa.inteface import createCoregistion
 
 @click.group()
 def cli():

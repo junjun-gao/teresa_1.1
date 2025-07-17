@@ -377,14 +377,48 @@ class LT1:
 
         self._read_external_orbit(f_orbit)
         return self
+    
 
-    @staticmethod
-    def usage() -> None:
+    def usage(self):
         """Print usage information"""
-        print("INFO    : @(#)LuTan-1 for Doris, Author: Yuxiao")
-        print("\nUsage   : python lt1_dump_header2doris.py metafile")
-        print("          - `metafile` is the LT1 meta file in xml format.\n")
-        print("This software is part of Doris InSAR software package.\n")
+        print("===========================================================")
+        print("           TERESA - 国产卫星 SAR 图像配准工具")
+        print("===========================================================")
+        print("Software Name   : TERESA (Tool for Enhanced Registration of Earth SAR imagery Automatically)")
+        print("Version         : v1.0.1")
+        print("Release Date    : 2025-07-20")
+        print("")
+        print("Developed by    : APRILab (Applied Processing & Remote-sensing Intelligence Lab)")
+        print("Affiliation     : 西北工业大学 无限抗干扰研究所 遥感信息处理实验室")
+        print("Website         : https://aprilab-nwpu.feishu.cn/wiki/wikcnyUVrWw1XGPmToUQdikLaug")
+        print("Contact Email   : yuxiao.qin@nwpu.edu.cn")
+        print("")
+        print("File Generated  : ", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        print("File Type       : SAR Registration Metadata")
+        print("Input Mission   : LuTan-1")
+        print("")
+        print("Description     : 本文件标记了配准处理过程，SAR 图像的基本信息等。")
+        print("")
+        print(" -----------------------------------------------------------")
+        print("")
+        print("**************************************************************")
+        print("*Processing_Status_Flag:")
+        print("**************************************************************")
+        print("Start_process_control")
+        print("readfiles:\t\t1")
+        print("precise_orbits:\t\t0")
+        print("modify_orbits:\t\t0")
+        print("crop:\t\t1")
+        print("sim_amplitude:\t\t0")
+        print("master_timing:\t\t0")
+        print("oversample:\t\t0")
+        print("resample:\t\t0")
+        print("filt_azi:\t\t0")
+        print("filt_range:\t\t0")
+        print("NOT_USED:\t\t0")
+        print("End_process_control")
+        print("")
+        print(" -----------------------------------------------------------")
 
 
 def lt1_dump_header2doris(source_meta_path, work_dir):
@@ -393,19 +427,5 @@ def lt1_dump_header2doris(source_meta_path, work_dir):
     lt1.meta["path"] = source_meta_path
     with open(result_file, "w") as f:
         with redirect_stdout(f):
-            print("Start_process_control")
-            print("readfiles:\t\t1")
-            print("precise_orbits:\t\t0")
-            print("modify_orbits:\t\t0")
-            print("crop:\t\t1")
-            print("sim_amplitude:\t\t0")
-            print("master_timing:\t\t0")
-            print("oversample:\t\t0")
-            print("resample:\t\t0")
-            print("filt_azi:\t\t0")
-            print("filt_range:\t\t0")
-            print("NOT_USED:\t\t0")
-            print("End_process_control")
-            print()
-            print("lt1_dump_header2doris.py v1.0, doris software, 2024")
+            lt1.usage()
             lt1.read_meta().update_external_orbit().export2res()

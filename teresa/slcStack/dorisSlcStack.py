@@ -1,6 +1,6 @@
 import os
 import re
-from logger_util import Logger
+from utils.logger_util import Logger
 from teresa.slcStack.radar_type import radar_type_pat_map, is_meta_file, is_data_file, get_date_from_filename
 
 class dorisSlcStack():

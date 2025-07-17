@@ -6,7 +6,7 @@ from teresa.slcStack.snapSlcStack import snapSlcStack
 from teresa.coregistion.dorisCoregistion import dorisCoregistion
 from teresa.coregistion.snapCoregistion import snapCoregistion
 
-from logger_util import Logger
+from utils.logger_util import Logger
 
 logger = Logger().get_logger()
 

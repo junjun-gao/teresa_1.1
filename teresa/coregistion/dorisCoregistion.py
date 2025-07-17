@@ -1,6 +1,6 @@
 import os
 import shutil
-from logger_util import Logger
+from utils.logger_util import Logger
 
 from teresa.processor.dorisProcessor import dorisProcessor
 from teresa.dump.dump_funcs_map import dump_header2doris_funcs, dump_data_funcs 
