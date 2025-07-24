@@ -7,7 +7,7 @@ class dorisProcessor():
         self.params = params   
 
     def _doris(self, arg):
-        _DORIS = os.getenv('STACK_BUILDER_DORIS', '/home/junjun/.local/doris/doris')  
+        _DORIS = os.getenv('STACK_BUILDER_DORIS', '/home/junjun/doris/doris/src/doris')  
         return subprocess.call([_DORIS, arg])
     
     def coarseorb(self, path):

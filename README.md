@@ -1,32 +1,24 @@
 TERESA
 ======
 
-Tool for Enhanced Registration of Earth SAR imagery Automatically  
-一个由 APRILab 开发的高效国产 SAR 图像批量配准工具。
 
-------------------------------------------------------------
+Teresa (Terrain Registration and Sampling Software) 是由西北工业大学电子信息学院 APRILab 团队自主研发的一款面向国产卫星的 SAR 图像批量配准工具。该工具以欧洲开发的 SAR 处理软件 DORIS 为基础，进行了深入的定制与优化，专门针对中国国产合成孔径雷达（SAR）卫星数据的特点进行适配与增强。
 
-✨ 功能亮点
----------
+当前版本的 Teresa 已成功支持包括 Lutan-1（LT1）、BC3 和 BC4 等国产主力 SAR 卫星的图像数据处理，能够在保持高精度配准效果的同时，大幅提升处理效率与稳定性。工具支持自动化批量处理流程，适用于大规模干涉图生成、地表形变监测和相关 InSAR 应用。
 
-- 支持国产卫星（lt1, bc3, bc4等）SAR 图像的批量配准
-- 亚像素精度估计，配准精度优于 0.1 像素
-- 多种配准方法（互相关、频域方法、相位差）
-- 输出配准结果与质量指标（RMSE、偏移矢量等）
-- 命令行工具，模块化架构，便于集成与扩展
+未来版本将持续扩展更多国产SAR平台的兼容性，并进一步集成智能配准算法与并行加速框架，服务于国产遥感数据处理的自主可控与工程化落地。
 
 ------------------------------------------------------------
 
 📦 安装方式
 ---------
 
-方法一：克隆项目并安装依赖
+方法一：克隆项目并安装依赖（conda 环境下）
 
     git clone https://github.com/aprilab-dev/teresa.git
-    cd teresa
-    pip install -r requirements.txt
+    conda env create -f environment.yml 
 
-方法二：通过 pip 安装（如已发布）
+方法二：通过 pip 安装（如已发布）！！！！！！！
 
     pip install teresa
 
@@ -34,14 +26,13 @@ Tool for Enhanced Registration of Earth SAR imagery Automatically
 
 🚀 快速开始
 ---------
+ 安装 doris 
 
-命令行运行：
-
-    teresa teresa.py templates/doris.parms
-
-也可通过配置文件运行：
+通过导入配置文件运行：
 
     python main.py templates/doris.parms
+
+配置文件 doris.parms 中的参数
 
 ------------------------------------------------------------
 
