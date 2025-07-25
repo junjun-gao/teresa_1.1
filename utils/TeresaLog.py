@@ -96,4 +96,4 @@ class TeresaLog:
         self.write("DEM-based coregistration completed.")
         self.write("=" * 100)
 
-global_log = TeresaLog(output_file="teresa_run.log")
+global_log = TeresaLog(output_file=None)
