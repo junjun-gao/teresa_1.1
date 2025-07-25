@@ -1,13 +1,10 @@
 import os
 import re
-from utils.logger_util import Logger
+from utils.TeresaLog import global_log
 from teresa.slcStack.radar_type import radar_type_pat_map, is_meta_file, is_data_file, get_date_from_filename
 
 class dorisSlcStack():
     def __init__(self, params):
-
-        self.logger = Logger().get_logger()
-
         self.params = params
         # ! 这些输入的参数，要检查一下，文件路径是否存在
         self.data_dir = self.params['stack_parameters']['data_dirs']
@@ -20,6 +17,14 @@ class dorisSlcStack():
         self.radar_type = ""
 
         self.initialize()
+
+        # 检查 master_date 是否合法
+        if (not self.master_date) | (self.master_date and self.master_date not in self.dates):
+            raise ValueError(f"Master date {self.master_date} not found. Please check the input parameters.")
+        
+        # 初始化日志、打印日志
+        global_log.radar_type = self.radar_type
+        global_log.start_global(task_count=len(self.dates) - 1)
 
 
     def initialize(self):
@@ -42,14 +47,10 @@ class dorisSlcStack():
         for dirpath, _, filenames in os.walk(os.path.abspath(self.data_dir)):
             for filename in filenames:
                 # 通过正则匹配，找到 data 数据文件，初始化 self.data_path_map
-                # self.logger.debug(f"Processing file: {filename}")
                 data_file = is_data_file[self.radar_type](filename)
-                # self.logger.debug(f"Is data file: {data_file}")
                 if data_file:
                     date_str = get_date_from_filename[self.radar_type]['data'](filename)
-                    # self.logger.debug(f"Extracted date string: {date_str} from filename: {filename}")
                     full_path = os.path.join(dirpath, filename)
-                    # self.logger.debug(f"Full path for data file: {full_path}")
                     self.data_path_map[date_str] = full_path  
 
 
@@ -57,9 +58,7 @@ class dorisSlcStack():
                 meta_file = is_meta_file[self.radar_type](filename)
                 if meta_file:
                     date_str = get_date_from_filename[self.radar_type]['meta'](filename)
-                    self.logger.debug(f"Extracted date string: {date_str} from filename: {filename}")
                     full_path = os.path.join(dirpath, filename)
-                    self.logger.debug(f"Full path for meta file: {full_path}")
                     self.meta_path_map[date_str] = full_path   
 
         # 初始化 self.dates 日期列表  
@@ -71,16 +70,9 @@ class dorisSlcStack():
         Check if the radar type matches the given pattern.
         """
         regex = re.compile(pattern)
-
-        self.logger.debug(f"Checking radar type with pattern: {pattern}")
-        self.logger.debug(f"Compiled regex: {regex}")
-        self.logger.debug(f"Searching in directory: {self.data_dir}")
-
         # 遍历 data_dir 目录下的所有文件，检查是否有匹配
         for _, _, filenames in os.walk(self.data_dir, followlinks=True):
             for filename in filenames:
-                self.logger.debug(f"Checking file: {filename}")
-                # LT1B_MONO_MYC_STRIP1_013101_E2.1_N49.2_20240726_SLC_HH_S2A_0000464655.meta.xml
                 if regex.match(filename):
                     return True
         return False

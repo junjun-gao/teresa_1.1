@@ -32,6 +32,10 @@
         "RS_OUT_FILE"   : "slave_rsmp.raw",
         "RS_OUT_FORMAT" : "ci2"          
     },
+    "interfero" : {
+        "INT_OUT_CINT"   : "interfero.raw",       
+        "INT_MULTILOOK"  : "1 1"                                                              
+    },
     "dem" : {
         "CRD_IN_DEM"     : "/data/auxiliary/dem/fr_paris_lt1/srtm1_wgs84_ellipsoid.dem",       
         "CRD_IN_FORMAT"  : "r4",                                  

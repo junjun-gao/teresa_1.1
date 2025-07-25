@@ -123,8 +123,7 @@ def bc3_dump_data(source_data_path, work_dir):
     az_lines, ra_samples = bc3_to_data(source_data_path, target_data_path, l0, lN, p0, pN)
 
     # ------------------ Plot is Optional -----------------------------------
-    # plot & export quicklook
-    sys.stdout.write("Exporting quicklook...")
+
     if l0 is None and lN is None and p0 is None and pN is None:
         l0: int = 1
         lN: int = az_lines
@@ -133,5 +132,3 @@ def bc3_dump_data(source_data_path, work_dir):
 
     res_file = os.path.join(work_dir, "slave.res")
     bc3_to_res(res_file, l0, lN, p0, pN)  # write result file
-
-    sys.stdout.write(" Done.\n")

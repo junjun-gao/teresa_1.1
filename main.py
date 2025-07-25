@@ -13,13 +13,9 @@ def coregister(parms_path):
     if not os.path.exists(parms_path):
         raise FileNotFoundError(f"File not found: {parms_path}")
 
-    print(f"Coregistration started with parameters from {parms_path}")
-
     slc_stack = createSlcStack(parms_path)
     coregister = createCoregistion(parms_path, slc_stack)
     coregister.run()
-
-    print("Coregistration completed successfully.")
 
 if __name__ == "__main__":   
     # load parameters file:

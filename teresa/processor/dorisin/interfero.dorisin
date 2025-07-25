@@ -12,7 +12,7 @@ OVERWRITE                                       // overwrite existing files
 BATCH                                           // non-interactive
 c LISTINPUT OFF                                 // prevents copy of this file to log
 c
-PROCESS          FINE
+PROCESS          INTERFERO
  c                                              //
  c                                              //
  comment  ___the general io files___            //
@@ -21,21 +21,12 @@ LOGFILE         log.out                         // log file
 M_RESFILE       ../master/master.res            // parameter file
 S_RESFILE       slave.res                       // parameter file
 I_RESFILE       coreg.out                       // parameter file
- c                                              //
+ c                                              // 
  c
  c
- comment ___FINE COREGISTRATION___
+ comment ___product generation___
  c
-FC_METHOD          oversample                      //
-FC_NWIN            6000                            // number of windows
-FC_WINSIZE         128 128                           // size of windows
-FC_ACC             32 32                             // search window, 2^n
-FC_INITOFF         coarsecorr                      // use result of coarse to compute first
-FC_OSFACTOR        32                              // oversampling factor
-FC_SHIFTAZI        ON
- c FC_IN_POS       fc_pos.in                       // file containing position of windows
- c FC_METHOD       magfft                          //
- c FC_METHOD       magspace                        //
- c FC_PLOT         0.65 BG
+INT_OUT_CINT interfero.raw
+INT_MULTILOOK 1 1
  c
 STOP

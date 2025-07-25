@@ -6,10 +6,6 @@ from teresa.slcStack.snapSlcStack import snapSlcStack
 from teresa.coregistion.dorisCoregistion import dorisCoregistion
 from teresa.coregistion.snapCoregistion import snapCoregistion
 
-from utils.logger_util import Logger
-
-logger = Logger().get_logger()
-
 def createSlcStack(parms_path):
     """
     Create a stack of SLC images from the given parameters.
@@ -23,12 +19,8 @@ def createSlcStack(parms_path):
     
     with open(parms_path,'r') as inp:
         parms = eval(inp.read())
-
-    logger.debug("parms:", parms)
     
     parms_file_name = os.path.basename(parms_path)
-
-    logger.debug(parms_file_name)
 
     if parms_file_name == 'snap.parms':
         return snapSlcStack(parms)

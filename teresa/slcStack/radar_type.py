@@ -5,24 +5,21 @@ import re
 radar_type_pat_map = {
     'LT1': r'^LT1.*\.meta\.xml$',
     'BC3': r'^bc3.*\.xml$',
-    'GF3': 'GF3*.meta.xml',
-    'FC1': 'spacety_SLC_SM_*.h5'
+    'BC4': r'^bc4.*\.xml$',
 }
 
 # 这个 map 是用来放不同类型的雷达数据 匹配 meta/xml 的正则项的
 is_meta_file = {
     'LT1': lambda x: bool(re.search(r'^LT1.*\.meta\.xml$', x)),
     'BC3': lambda x: bool(re.search(r'^bc3.*\.xml$', x)),
-    'GF3': lambda x: bool(re.search(r'GF3*.meta.xml', x)),
-    'FC1': lambda x: bool(re.search(r'spacety_SLC_SM_*.h5', x)),
+    'BC4': lambda x: bool(re.search(r'^bc4.*\.xml$', x)),
 }
 
 # 这个 map 是用来放不同类型的雷达数据 匹配 data 的正则项的
 is_data_file = { 
     'LT1': lambda x: bool(re.search(r'^LT1.*\.tiff$', x)),
     'BC3': lambda x: bool(re.search(r'^bc3.*\.tiff$', x)),
-    'GF3': lambda x: bool(re.search(r'GF3*_(H|V)(H|V)_*.tiff', x)),
-    'FC1': lambda x: bool(re.search(r'spacety_SLC_SM_*.h5', x)),
+    'BC4': lambda x: bool(re.search(r'^bc4.*\.tiff$', x)),
 }
 
 get_date_from_filename = { 
@@ -30,8 +27,6 @@ get_date_from_filename = {
             'data': lambda x: re.search(r'LT1.*_(20\d{6})', x).group(1)},
     'BC3': {'meta': lambda x: re.search(r'bc3.*(20\d{6})', x).group(1),
             'data': lambda x: re.search(r'bc3.*(20\d{6})', x).group(1)},
-    'GF3': {'meta': lambda x: re.search(r'GF3.*_(\d{8})', x).group(1),
-            'data': lambda x: re.search(r'GF3.*_(\d{8})', x).group(1)},
-    'FC1': {'meta': lambda x: re.search(r'spacety_SLC_SM_(\d{8})', x).group(1),
-            'data': lambda x: re.search(r'spacety_SLC_SM_(\d{8})', x).group(1)}
+    'BC4': {'meta': lambda x: re.search(r'bc4.*(20\d{6})', x).group(1),
+            'data': lambda x: re.search(r'bc4.*(20\d{6})', x).group(1)},
 }
